@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}UPI Payment - Online Vegetable Shop{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width:600px;">
+    <h2 style="text-align:center;margin-bottom:1.5rem;">💳 UPI Payment</h2>
+    
+    <div style="background:#f8f9fa;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;">
+        <h3 style="margin-bottom:1rem;">Order Summary</h3>
+        {% for item in cart_items %}
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #ddd;">
+            <span>{{ item.product.name }} ({{ item.price_option.quantity }}) x {{ item.quantity }}</span>
+            <span>₹{{ "%.2f"|format(item.price_option.price * item.quantity) }}</span>
+        </div>
+        {% endfor %}
+        <div style="display:flex;justify-content:space-between;padding:1rem 0;font-size:1.2rem;font-weight:bold;color:#2c3e50;">
+            <span>Total Amount:</span>
+            <span style="color:#27ae60;">₹{{ "%.2f"|format(total) }}</span>
+        </div>
+    </div>
+    
+    <div style="text-align:center;margin-bottom:2rem;">
+        <h3 style="margin-bottom:1rem;">Scan QR Code to Pay</h3>
+        <div style="background:white;padding:1rem;border-radius:10px;display:inline-block;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <!-- UPI QR Code generated with API -->
+            <img id="qrCode" src="" alt="UPI QR Code" style="width:250px;height:250px;">
+        </div>
+        <p style="margin-top:1rem;color:#7f8c8d;">Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</p>
+    </div>
+    
+    <div style="background:#f8f9fa;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;">
+        <div style="margin-bottom:1rem;">
+            <strong>UPI ID:</strong> 
+            <span id="upiId" style="font-size:1.2rem;color:#2c3e50;font-weight:bold;">ovg@shop123</span>
+            <button onclick="copyUPI()" style="margin-left:0.5rem;padding:0.3rem 0.8rem;background:#3498db;color:white;border:none;border-radius:5px;cursor:pointer;">📋 Copy</button>
+        </div>
+        <div>
+            <strong>Amount:</strong> 
+            <span style="font-size:1.2rem;color:#27ae60;font-weight:bold;">₹{{ "%.2f"|format(total) }}</span>
+        </div>
+    </div>
+    
+    <button onclick="confirmPayment()" class="btn btn-primary" style="width:100%;padding:1rem;font-size:1.1rem;background:linear-gradient(135deg, #27ae60, #2ecc71);">
+        ✓ Confirm Payment & Complete Order
+    </button>
+    
+    <a href="{{ url_for('checkout') }}" class="btn btn-secondary" style="display:block;text-align:center;margin-top:1rem;">← Back to Checkout</a>
+</div>
+
+<script>
+const totalAmount = {{ total }};
+const upiId = 'ovg@shop123';
+const merchantName = 'Online Vegetable Shop';
+
+// Generate UPI payment URL
+const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${totalAmount}&cu=INR`;
+
+// Generate QR Code using QR Server API
+document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+
+function copyUPI() {
+    navigator.clipboard.writeText(upiId).then(() => {
+        alert('UPI ID copied to clipboard!');
+    });
+}
+
+function confirmPayment() {
+    if (confirm('Have you completed the payment of ₹' + totalAmount.toFixed(2) + ' to ' + upiId + '?')) {
+        // Generate unique UTR number automatically
+        const utr = 'UPI' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+        
+        // Submit payment verification
+        fetch('/payment/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                utr: utr,
+                amount: totalAmount,
+                upi_id: upiId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/payment/success/' + data.order_id;
+            } else {
+                alert('Payment verification failed: ' + (data.message || 'Please try again'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+}
+</script>
+{% endblock %}

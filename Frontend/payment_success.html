@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Success - Online Vegetable Shop{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width:700px;">
+    <div style="text-align:center;margin-bottom:2rem;">
+        <div style="font-size:4rem;color:#27ae60;">✅</div>
+        <h1 style="color:#27ae60;margin-bottom:0.5rem;">Payment Successful!</h1>
+        <p style="color:#7f8c8d;">Your order has been placed successfully</p>
+    </div>
+    
+    <div style="background:#f8f9fa;padding:1.5rem;border-radius:10px;margin-bottom:1.5rem;">
+        <h3 style="margin-bottom:1rem;border-bottom:2px solid #2c3e50;padding-bottom:0.5rem;">Order Details</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+                <strong>Order ID:</strong> #{{ order.id }}
+            </div>
+            <div>
+                <strong>Date:</strong> {{ order.order_date.strftime('%d-%m-%Y %H:%M') }}
+            </div>
+            <div>
+                <strong>Customer:</strong> {{ order.user.username }}
+            </div>
+            <div>
+                <strong>Email:</strong> {{ order.user.email }}
+            </div>
+        </div>
+    </div>
+    
+    <div style="background:white;padding:1.5rem;border-radius:10px;border:1px solid #ddd;margin-bottom:1.5rem;">
+        <h3 style="margin-bottom:1rem;">Items Ordered</h3>
+        <table style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr style="background:#f8f9fa;">
+                    <th style="padding:0.8rem;text-align:left;border-bottom:2px solid #ddd;">Product</th>
+                    <th style="padding:0.8rem;text-align:center;border-bottom:2px solid #ddd;">Quantity</th>
+                    <th style="padding:0.8rem;text-align:right;border-bottom:2px solid #ddd;">Price</th>
+                    <th style="padding:0.8rem;text-align:right;border-bottom:2px solid #ddd;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items %}
+                <tr>
+                    <td style="padding:0.8rem;border-bottom:1px solid #eee;">{{ item.product.name }}</td>
+                    <td style="padding:0.8rem;text-align:center;border-bottom:1px solid #eee;">{{ item.quantity }}</td>
+                    <td style="padding:0.8rem;text-align:right;border-bottom:1px solid #eee;">₹{{ "%.2f"|format(item.price) }}</td>
+                    <td style="padding:0.8rem;text-align:right;border-bottom:1px solid #eee;">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align:right;margin-top:1rem;font-size:1.2rem;font-weight:bold;color:#27ae60;">
+            Total Paid: ₹{{ "%.2f"|format(order.total_amount) }}
+        </div>
+    </div>
+    
+    <div style="background:#f8f9fa;padding:1rem;border-radius:10px;margin-bottom:1.5rem;">
+        <strong>Payment Method:</strong> UPI Payment<br>
+        <strong>UPI ID:</strong> ovg@shop123<br>
+        <strong>Transaction ID:</strong> {{ payment.utr_number }}
+    </div>
+    
+    <div style="display:flex;gap:1rem;">
+        <a href="{{ url_for('download_invoice', order_id=order.id) }}" class="btn btn-primary" style="flex:1;text-align:center;">
+            📄 Download Invoice PDF
+        </a>
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary" style="flex:1;">
+            View My Orders
+        </a>
+    </div>
+</div>
+{% endblock %}

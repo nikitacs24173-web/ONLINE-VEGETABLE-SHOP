@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Online Vegetable Shop{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">💳 Checkout</h1>
+
+<div class="cart-table" style="margin-bottom:1.5rem;">
+    <h3 style="padding:1rem;background-color:var(--light);">Order Summary</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.product.name }} ({{ item.price_option.quantity }})</td>
+                <td>₹{{ "%.2f"|format(item.price_option.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ "%.2f"|format(item.price_option.price * item.quantity) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="cart-total" style="margin-bottom:1.5rem;">
+    <div>
+        <span style="font-size:1.2rem;">Total Amount:</span>
+        <span class="amount">₹{{ "%.2f"|format(total) }}</span>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('initiate_payment') }}">
+    <div style="background-color:var(--white);padding:1.5rem;border-radius:10px;box-shadow:var(--shadow);">
+        <h3 style="margin-bottom:1rem;">Payment Method</h3>
+        <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:#f8f9fa;border-radius:5px;margin-bottom:1rem;">
+            <input type="radio" name="payment_method" value="upi" checked style="width:auto;">
+            <span style="font-size:1.2rem;">📱 UPI Payment (GPay, PhonePe, Paytm)</span>
+        </div>
+        <p style="margin-bottom:1rem;color:#7f8c8d;">You will be redirected to the UPI payment page with QR code.</p>
+        <div style="display:flex;gap:1rem;">
+            <a href="{{ url_for('cart') }}" class="btn btn-secondary">Back to Cart</a>
+            <button type="submit" class="btn btn-primary" style="flex:1;">Proceed to Pay</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

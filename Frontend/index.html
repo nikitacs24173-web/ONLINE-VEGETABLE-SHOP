@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Online Vegetable Shop{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🥦 Fresh Vegetables at Your Doorstep</h1>
+    <p>Delivering farm-fresh, organic vegetables straight to your home</p>
+    {% if session.user_id %}
+        <a href="{{ url_for('shop') }}" class="btn btn-explore">🛒 Explore to Shop</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-explore">Login to Start Shopping</a>
+    {% endif %}
+</div>
+
+<!-- Why Choose Us Section -->
+<div class="why-choose-us">
+    <h2>Why Choose OVS?</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🌿</div>
+            <h3>100% Organic</h3>
+            <p>All our vegetables are fresh, organic, and grown without harmful pesticides</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🚚</div>
+            <h3>Fast Delivery</h3>
+            <p>Get your orders delivered to your doorstep within hours of placing</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3>Best Prices</h3>
+            <p>Competitive pricing with no hidden charges or delivery fees</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">✅</div>
+            <h3>Quality Assured</h3>
+            <p>Every product goes through strict quality checks before delivery</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Easy Returns</h3>
+            <p>Not satisfied? Get a full refund with our hassle-free return policy</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📞</div>
+            <h3>24/7 Support</h3>
+            <p>Our customer support team is always ready to help you</p>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Online Vegetable Shop Section -->
+<div class="why-online-shop">
+    <h2>Why Shop Online With Us?</h2>
+    <div class="benefits-list">
+        <div class="benefit-item">
+            <span class="benefit-check">✓</span>
+            <div>
+                <h3>Convenience at Your Fingertips</h3>
+                <p>Order from the comfort of your home, anytime, anywhere</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-check">✓</span>
+            <div>
+                <h3>Wider Selection</h3>
+                <p>Choose from a variety of fresh vegetables all in one place</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-check">✓</span>
+            <div>
+                <h3>Save Time & Energy</h3>
+                <p>No more traveling to markets or waiting in long queues</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-check">✓</span>
+            <div>
+                <h3>Track Your Orders</h3>
+                <p>Real-time order tracking from confirmation to delivery</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-check">✓</span>
+            <div>
+                <h3>Secure Payments</h3>
+                <p>Safe and encrypted payment processing for your peace of mind</p>
+            </div>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-check">✓</span>
+            <div>
+                <h3>Freshness Guaranteed</h3>
+                <p>We guarantee the freshness of every vegetable we deliver</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

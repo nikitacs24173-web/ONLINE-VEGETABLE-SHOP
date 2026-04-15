@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Shop - Online Vegetable Shop{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🛒 Shop Fresh Vegetables</h1>
+    <p>Browse our selection of fresh, organic vegetables</p>
+</div>
+
+<form class="search-bar" method="GET" action="{{ url_for('shop') }}">
+    <input type="text" name="search" placeholder="Search vegetables..." value="{{ search_query }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if products %}
+<div class="product-grid">
+    {% for product in products %}
+    {% if product.prices %}
+    <div class="product-card">
+        <div class="product-image">
+            {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+                🥬
+            {% endif %}
+        </div>
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="description">{{ product.description }}</p>
+            
+            {% set default_price = product.prices|first %}
+            
+            <div class="price-options">
+                <label class="option-label">Select Quantity:</label>
+                <select name="price_id" id="price_{{ product.id }}" class="price-select" onchange="updatePrice({{ product.id }})">
+                    {% for price_option in product.prices %}
+                    <option value="{{ price_option.id }}" data-price="{{ price_option.price }}">{{ price_option.quantity }} - ₹{{ "%.2f"|format(price_option.price) }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <p class="price" id="display_price_{{ product.id }}">₹{{ "%.2f"|format(default_price.price) }}</p>
+            <p class="stock {% if product.stock == 0 %}out-of-stock{% endif %}">
+                {% if product.stock > 0 %}
+                    In Stock: {{ product.stock }} available
+                {% else %}
+                    Out of Stock
+                {% endif %}
+            </p>
+            {% if product.stock > 0 %}
+            <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+                <input type="hidden" name="price_id" id="hidden_price_{{ product.id }}" value="{{ default_price.id }}">
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+            </form>
+            {% else %}
+            <button class="btn" disabled style="width:100%;background-color:#ccc;cursor:not-allowed;">Out of Stock</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">🔍</div>
+    <h3>No products found</h3>
+    <p>{% if search_query %}Try a different search term{% else %}No products available{% endif %}</p>
+</div>
+{% endif %}
+
+<script>
+function updatePrice(productId) {
+    const select = document.getElementById('price_' + productId);
+    const selectedOption = select.options[select.selectedIndex];
+    const price = selectedOption.getAttribute('data-price');
+    const hiddenInput = document.getElementById('hidden_price_' + productId);
+    
+    document.getElementById('display_price_' + productId).textContent = '₹' + parseFloat(price).toFixed(2);
+    hiddenInput.value = selectedOption.value;
+}
+</script>
+{% endblock %}

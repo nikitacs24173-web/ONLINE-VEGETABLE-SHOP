@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Cart - Online Vegetable Shop{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">🛒 Your Cart</h1>
+
+{% if cart_items %}
+<div class="cart-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity Option</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>
+                    <div class="cart-product">
+                        {% if item.product.image_url %}
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="cart-product-img">
+                        {% endif %}
+                        <span>{{ item.product.name }}</span>
+                    </div>
+                </td>
+                <td><span class="quantity-badge">{{ item.price_option.quantity }}</span></td>
+                <td>₹{{ "%.2f"|format(item.price_option.price) }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('update_cart', cart_id=item.id) }}" style="display:inline;">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
+                               class="cart-quantity-input">
+                        <button type="submit" class="btn btn-small btn-secondary">Update</button>
+                    </form>
+                </td>
+                <td class="subtotal">₹{{ "%.2f"|format(item.price_option.price * item.quantity) }}</td>
+                <td>
+                    <a href="{{ url_for('remove_from_cart', cart_id=item.id) }}" class="btn btn-small btn-danger">Remove</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="cart-total">
+    <div>
+        <span style="font-size:1.2rem;">Total:</span>
+        <span class="amount">₹{{ "%.2f"|format(total) }}</span>
+    </div>
+    <a href="{{ url_for('checkout') }}" class="btn btn-primary" style="font-size:1.1rem;">Proceed to Checkout</a>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">🛒</div>
+    <h3>Your cart is empty</h3>
+    <p>Add some fresh vegetables to get started!</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary" style="margin-top:1rem;">Browse Products</a>
+</div>
+{% endif %}
+{% endblock %}
